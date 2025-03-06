@@ -46,7 +46,23 @@ Usage of dir2opds:
 
 ## Tested on
 
-- Moon+ reader
+### Moon+ reader
+
+### Cantook
+
+It works on Cantook reader for me on iPhone.
+
+<https://apps.apple.com/us/app/cantook-by-aldiko/id1476410111>
+
+It would be nice if this was stated in README.
+
+### KYBook 3
+
+It works with [KyBook 3 Ebook Reader](https://apps.apple.com/us/app/kybook-3-ebook-reader/id1348198785) if access to Local Network is enabled in settings.  
+
+To enable access go to Settings -> Apps -> KyBook 3 -> Local Network (checked).
+
+It seems that KyBook is so old, that it does not trigger access prompt from iOS, so it has to be configured manually.
 
 ## More information
 
@@ -92,6 +108,28 @@ ExecStart=/home/pi/dir2opds/dir2opds -dir <FULL PATH OF BOOKS FOLDER> -port 8080
 
 [Install]
 WantedBy=multi-user.target
+```
+
+## Rootless Container with podman
+
+```sh
+# build image
+podman build -t localhost/dir2opds .
+# prepare Books directory
+mkdir /data/Books
+chown -R $USER:$USER /data/Books
+# run built image
+podman run --name dir2opds --rm --userns=keep-id --mount type=bind,src=/data/Books,dst=/books,Z --publish 8008:8080 -i -t localhost/dir2opds /dir2opds -debug
+```
+
+where
+
+- `/data/Books` is a path to directory containing books.
+
+Test from host with
+
+```sh
+curl http://localhost:8008
 ```
 
 ## How to contribute
